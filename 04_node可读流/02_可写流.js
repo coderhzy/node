@@ -19,7 +19,7 @@ fs.writeFile(
 // 2. 创建一个可写流
 const writeStream = fs.createWriteStream("./ccc.txt", {
   encoding: "utf-8",
-  flag: "w",
+  flag: "a+",
 });
 
 writeStream.write("nice", (err) => {
