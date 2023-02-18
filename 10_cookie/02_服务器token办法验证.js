@@ -1,17 +1,21 @@
 const Koa = require("koa");
 const KoaRouter = require("@koa/router");
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
 
 const app = new Koa();
 
 const userRouter = new KoaRouter({ prefix: "/user" });
 
-const secretKey = "salt";
+const privateKey = fs.readFileSync("./private.key");
+const publicKey = fs.readFileSync("./public.key");
 
 userRouter.get("/login", async (ctx) => {
   // 1. 颁发tokens
-  const token = jwt.sign({ name: "nice" }, secretKey, {
+  const payload = { name: "nice" };
+  const token = jwt.sign(payload, privateKey, {
     expiresIn: 60,
+    algorithm: "RS256",
   });
 
   ctx.body = {
@@ -29,8 +33,16 @@ userRouter.get("/info", async (ctx) => {
 
   // 2. 验证token
   try {
-    const result = jwt.verify(token, secretKey);
-    ctx.body = "用户信息";
+    const result = jwt.verify(token, publicKey, {
+      algorithms: ["RS256"],
+    });
+    if (result.name == "nice") {
+      ctx.body = {
+        code: 1001,
+        message: "用户信息",
+      };
+      return;
+    }
   } catch (error) {
     ctx.body = {
       code: 1001,
