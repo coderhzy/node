@@ -8,15 +8,9 @@ const connection = mysql.createConnection({
   password: "example",
 });
 
-connection.connect((err) => {
-  if (err) throw err;
-
-  console.log("数据库连接成功!");
-});
-
-const statement = "SELECT * FROM `students`;";
-
-connection.query(statement, (err, value, fields) => {
+// 执行预处理语句
+const statement = `SELECT * FROM products WHERE price > ? AND score > ?;`;
+connection.execute(statement, [990, 8], (err, value) => {
   if (err) {
     console.log("查询失败", err);
     return;
